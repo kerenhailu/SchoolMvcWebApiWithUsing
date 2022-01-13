@@ -25,52 +25,120 @@ namespace SchoolMvcWebApi.Controllers.API
                     string query = @"SELECT * FROM Teacher";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     SqlDataReader dataFromDB = cmd.ExecuteReader();
-                    cmd.ExecuteReader();
                     if (dataFromDB.HasRows)
                     {
                         while (dataFromDB.Read())
                         {
                             Teachers.Add((new Teacher(dataFromDB.GetInt32(0), dataFromDB.GetString(1), dataFromDB.GetString(2), dataFromDB.GetInt32(3), dataFromDB.GetDateTime(4))));
                         }
+                        conn.Close();
                         return Ok(new { Teachers });
                     }
-                    conn.Close();
                     return Ok(new { Teachers });
                 }
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            //catch (SqlException ex)
-            //{
-            //    return ex.Message;
-            //}
+
         }
+
+
 
         // GET: api/Teacher/5
         public IHttpActionResult Get(int id)
         {
-            return Ok();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(stringCollection))
+                {
+                    conn.Open();
+                    string query = $@"SELECT * FROM Teacher WHERE Teacher.id={id}";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    SqlDataReader dataFromDB = cmd.ExecuteReader();
+                    if (dataFromDB.HasRows)
+                    {
+                        while (dataFromDB.Read())
+                        {
+                            Teacher teacherID = new Teacher(dataFromDB.GetInt32(0), dataFromDB.GetString(1), dataFromDB.GetString(2), dataFromDB.GetInt32(3), dataFromDB.GetDateTime(4));
+
+                            conn.Close();
+                            return Ok(new { teacherID });
+                        }
+                    }
+                    return Ok(new { Teachers });
+                }
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
         }
 
         // POST: api/Teacher
         public IHttpActionResult Post([FromBody] Teacher teacher)
         {
-            return Ok();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(stringCollection))
+                {
+                    connection.Open();
+                    string query = $@"INSERT INTO Teacher(name,lName,wage,birthday)
+                       VALUES('{teacher.Name}','{teacher.LName}',{teacher.wage},'{teacher.Birthday}')";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    int rowsEffected = command.ExecuteNonQuery();
+                    connection.Close();
+                    return Ok(rowsEffected);
+                }
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT: api/Teacher/5
         public IHttpActionResult Put(int id, [FromBody] Teacher teacher)
         {
-            return Ok();
+            using (SqlConnection connection = new SqlConnection(stringCollection))
+            {
+                string query = $@"UPDATE STUDENT 
+                                SET firstName = '{teacher.Name}', lastName='{teacher.LName}', wage={teacher.wage}, birthday='{teacher.Birthday}'
+            WHERE Id = {id}";
+                SqlCommand command = new SqlCommand(query, connection);
+                int rowsEffected = command.ExecuteNonQuery();
+                connection.Close();
+                return Ok(rowsEffected);
+            }
         }
 
         // DELETE: api/Teacher/5
         public IHttpActionResult Delete(int id)
         {
-            return Ok();
+            using (SqlConnection connection = new SqlConnection(stringCollection))
+            {
+                connection.Open();
+                string query = $@"DELETE FROM STUDENT
+                                    WHERE Id = {id}";
+                SqlCommand command = new SqlCommand(query, connection);
+                int rowEffected = command.ExecuteNonQuery();
+                connection.Close();
+                return Ok(rowEffected);
+            }
         }
     }
 }
