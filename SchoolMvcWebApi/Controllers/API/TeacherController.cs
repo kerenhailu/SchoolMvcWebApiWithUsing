@@ -116,13 +116,14 @@ namespace SchoolMvcWebApi.Controllers.API
         {
             using (SqlConnection connection = new SqlConnection(stringCollection))
             {
-                string query = $@"UPDATE STUDENT 
+                connection.Open();
+                string query = $@"UPDATE Teacher 
                                 SET firstName = '{teacher.Name}', lastName='{teacher.LName}', wage={teacher.wage}, birthday='{teacher.Birthday}'
-            WHERE Id = {id}";
+            WHERE Teacher.id={id}";
                 SqlCommand command = new SqlCommand(query, connection);
-                int rowsEffected = command.ExecuteNonQuery();
+                //int rowsEffected = command.ExecuteNonQuery();
                 connection.Close();
-                return Ok(rowsEffected);
+                return Ok("putttttttttt");
             }
         }
 
@@ -132,12 +133,13 @@ namespace SchoolMvcWebApi.Controllers.API
             using (SqlConnection connection = new SqlConnection(stringCollection))
             {
                 connection.Open();
-                string query = $@"DELETE FROM STUDENT
+                string query = $@"DELETE FROM Teacher
                                     WHERE Id = {id}";
                 SqlCommand command = new SqlCommand(query, connection);
                 int rowEffected = command.ExecuteNonQuery();
                 connection.Close();
                 return Ok(rowEffected);
+                //return Ok("you delete");
             }
         }
     }
